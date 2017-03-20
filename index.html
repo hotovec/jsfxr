@@ -11,6 +11,7 @@
     <script type="text/javascript" src="/static/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/static/jquery/jquery-ui.min.js"></script>
 
+
     <script>
 
         var PARAMS;
@@ -35,6 +36,7 @@
             PARAMS.sound_vol = SOUND_VOL;
             PARAMS.sample_rate = SAMPLE_RATE;
             PARAMS.sample_size = SAMPLE_SIZE;
+            console.dir(PARAMS);
             PARAMS[fx]();
             $("#wav").text(fx + ".wav");
             updateUi();
@@ -52,6 +54,23 @@
                 var audio = new Audio();
                 if (!noregen) {
                     SOUND = new SoundEffect(PARAMS).generate();
+                    $("#file_size").text(Math.round(SOUND.wav.length / 1024) + "kB");
+                    $("#num_samples").text(SOUND.header.subChunk2Size /
+                        (SOUND.header.bitsPerSample >> 3));
+                    $("#clipping").text(SOUND.clipping);
+                }
+                audio.src = SOUND.dataURI;
+                $("#wav").attr("href", SOUND.dataURI);
+                $("#sfx").attr("href", "sfx.wav?" + PARAMS.query());
+                audio.play();
+            }, 0);
+        }
+
+        function playExtra(params, noregen) {
+            setTimeout(function () {
+                var audio = new Audio();
+                if (!noregen) {
+                    SOUND = new SoundEffect(params).generate();
                     $("#file_size").text(Math.round(SOUND.wav.length / 1024) + "kB");
                     $("#num_samples").text(SOUND.header.subChunk2Size /
                         (SOUND.header.bitsPerSample >> 3));
@@ -326,6 +345,40 @@
 
     </script>
 
+    <script>
+        testParams = {
+            oldParams: true,
+            wave_type: 0,
+            p_env_attack: 0,
+            p_env_sustain: 0.03885616052197145,
+            p_env_punch: 0.3419336034345536,
+            p_env_decay: 0.47182521850470216,
+            p_base_freq: 0.6248389023964688,
+            p_freq_limit: 0,
+            p_freq_ramp: 0,
+            p_freq_dramp: 0,
+            p_vib_strength: 0,
+            p_vib_speed: 0,
+            p_arp_mod: 0,
+            p_arp_speed: 0,
+            p_duty: 0,
+            p_duty_ramp: 0,
+            p_repeat_speed: 0,
+            p_pha_offset: 0,
+            p_pha_ramp: 0,
+            p_lpf_freq: 1,
+            p_lpf_ramp: 0,
+            p_lpf_resonance: 0,
+            p_hpf_freq: 0,
+            p_hpf_ramp: 0,
+            sound_vol: 0.25,
+            sample_rate: 44100,
+            sample_size: 8
+        };
+
+    </script>
+
+
     <style>
 
         button, p, #sound_vol {
@@ -445,6 +498,11 @@
 </head>
 
 <body>
+
+<div>testParams:
+    <button onclick="playExtra(testParams)">TestParams</button>
+    <button onclick="playExtra(testParams,true)">TestParamsNoregen</button>
+</div>
 
 <div>
     <h1>jsfxr</h1>
